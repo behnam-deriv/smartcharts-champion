@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:chart_app/src/interop/js_interop.dart';
 import 'package:chart_app/src/misc/wrapped_controller.dart';

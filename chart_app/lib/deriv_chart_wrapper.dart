@@ -1,6 +1,5 @@
 import 'dart:collection';
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:chart_app/src/chart_app.dart';
 import 'package:chart_app/src/helpers/marker_painter.dart';
@@ -17,8 +16,8 @@ import 'package:chart_app/src/series/time_interval_indicator.dart';
 import 'package:deriv_chart/deriv_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+// Use the web package instead of dart:html for WASM compatibility
+import 'package:web/web.dart' as web;
 
 /// DerivChartWrapper
 class DerivChartWrapper extends StatefulWidget {
@@ -74,7 +73,7 @@ class DerivChartWrapperState extends State<DerivChartWrapper> {
   }
 
   bool _shouldUseLowAnimation() {
-    final String userAgent = html.window.navigator.userAgent;
+    final String userAgent = web.window.navigator.userAgent;
 
     final List<String> devices = <String>[
       'Android',
@@ -361,7 +360,8 @@ class DerivChartWrapperState extends State<DerivChartWrapper> {
                       dataFitEnabled: configModel.startWithDataFitMode,
                       showCrosshair: configModel.showCrosshair,
                       isLive: configModel.isLive,
-                      onCrosshairDisappeared: JsInterop.onCrosshairDisappeared,
+                      onCrosshairDisappeared: () =>
+                          JsInterop.onCrosshairDisappeared(),
                       onCrosshairHover: _onCrosshairHover,
                       chartAxisConfig: ChartAxisConfig(
                         maxCurrentTickOffset:

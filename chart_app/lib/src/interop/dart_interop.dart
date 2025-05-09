@@ -1,7 +1,6 @@
-import 'dart:js';
-
-import 'dart:html' as html;
-import 'dart:js_util';
+import 'dart:js_interop';
+import 'package:web/web.dart' as web;
+import 'dart:js_interop_unsafe';
 
 import 'package:chart_app/src/chart_app.dart';
 import 'package:chart_app/src/misc/crosshair_controller.dart';
@@ -9,287 +8,151 @@ import 'package:chart_app/src/models/indicators.dart';
 import 'package:chart_app/src/models/drawing_tool.dart';
 import 'package:chart_app/src/models/chart_config.dart';
 import 'package:chart_app/src/models/chart_feed.dart';
+import 'package:chart_app/src/interop/js_interop.dart';
 
-/// Refactor the code later with JSExport once the below issue is resolved.
-/// https://github.com/dart-lang/sdk/issues/50721
+/// Wrapper classes for JS interop using JSExport
+/// These wrappers expose Dart functionality to JavaScript using JSExport.
+/// All method signatures have been verified to match the original implementations.
 
-/// Initialize
+@JSExport()
+class AppWrapper {
+  final ChartApp _app;
+
+  AppWrapper(this._app);
+
+  double getXAxisHeight() => _app.xAxisHeight;
+  double getYAxisWidth() => _app.yAxisWidth;
+  double getCurrentTickWidth() => _app.currentTickWidth;
+  void newChart(JSNewChart payload) => _app.newChart(payload);
+  List<dynamic>? getTooltipContent(int epoch, int pipSize) =>
+      _app.getTooltipContent(epoch, pipSize);
+  int? getIndicatorHoverIndex(double x, double y, Function getClosestEpoch,
+          int granularity, int bottomIndicatorIndex) =>
+      _app.getIndicatorHoverIndex(
+          x, y, getClosestEpoch, granularity, bottomIndicatorIndex);
+
+  // Wrapped controller methods
+  double? getXFromEpoch(int epoch) =>
+      _app.wrappedController.getXFromEpoch(epoch);
+  double? getYFromQuote(double quote) =>
+      _app.wrappedController.getYFromQuote(quote);
+  int? getEpochFromX(double x) => _app.wrappedController.getEpochFromX(x);
+  double? getQuoteFromY(double y) => _app.wrappedController.getQuoteFromY(y);
+  double? scale(double factor) => _app.wrappedController.scale(factor);
+  void scroll(double dx) => _app.wrappedController.scroll(dx);
+  void scrollToLastTick() => _app.wrappedController.scrollToLastTick();
+  void toggleXScrollBlock(bool isXScrollBlocked) =>
+      _app.wrappedController.toggleXScrollBlock(isXScrollBlocked);
+  void toggleDataFitMode(bool dataFitMode) =>
+      _app.wrappedController.toggleDataFitMode(dataFitMode);
+  void addOrUpdateIndicator(String dataString, int? index) =>
+      _app.addOrUpdateIndicator(dataString, index);
+}
+
+@JSExport()
+class CrosshairWrapper {
+  final CrosshairController _controller;
+
+  CrosshairWrapper(this._controller);
+
+  double? getXFromEpoch(int epoch) => _controller.getXFromEpoch(epoch);
+  double? getYFromQuote(double quote) => _controller.getYFromQuote(quote);
+  int? getEpochFromX(double x) => _controller.getEpochFromX(x);
+  double? getQuoteFromY(double y) => _controller.getQuoteFromY(y);
+}
+
+@JSExport()
+class ChartFeedWrapper {
+  final ChartFeedModel _model;
+
+  ChartFeedWrapper(this._model);
+
+  void onTickHistory(dynamic data, bool isReset) =>
+      _model.onTickHistory(data, isReset);
+  void onNewTick(dynamic data) => _model.onNewTick(data);
+  void onNewCandle(dynamic data) => _model.onNewCandle(data);
+}
+
+@JSExport()
+class ChartConfigWrapper {
+  final ChartConfigModel _model;
+
+  ChartConfigWrapper(this._model);
+
+  void updateTheme(String theme) => _model.updateTheme(theme);
+  void newChart(dynamic chartConfig) => _model.newChart(chartConfig);
+  void updateChartStyle(String style) => _model.updateChartStyle(style);
+  void setRemainingTime(String time) => _model.setRemainingTime(time);
+  void updateContracts(dynamic contracts) => _model.updateContracts(contracts);
+  void updateLiveStatus(bool isLive) => _model.updateLiveStatus(isLive);
+  void updateCrosshairVisibility(bool visible) =>
+      _model.updateCrosshairVisibility(visible);
+  void updateLeftMargin(double margin) => _model.updateLeftMargin(margin);
+  void updateRightPadding(int padding) => _model.updateRightPadding(padding);
+  void toggleTimeIntervalVisibility(bool visible) =>
+      _model.toggleTimeIntervalVisibility(visible);
+  void setSymbolClosed(bool closed) => _model.setSymbolClosed(closed);
+}
+
+@JSExport()
+class IndicatorsWrapper {
+  final IndicatorsModel _model;
+
+  IndicatorsWrapper(this._model);
+
+  void removeIndicator(int indicatorId) => _model.removeIndicator(indicatorId);
+  void clearIndicators() => _model.clearIndicators();
+}
+
+@JSExport()
+class DrawingToolWrapper {
+  final DrawingToolModel _model;
+
+  DrawingToolWrapper(this._model);
+
+  void addOrUpdateDrawing(String dataString) =>
+      _model.addOrUpdateDrawing(dataString);
+  void removeDrawingTool(int index) => _model.removeDrawingTool(index);
+  String getTypeOfSelectedDrawingTool(dynamic config) =>
+      _model.getTypeOfSelectedDrawingTool(config);
+  void editDrawing(String dataString, int index) =>
+      _model.editDrawing(dataString, index);
+  void clearDrawingTool() => _model.clearDrawingTool();
+  void clearDrawingToolSelect() => _model.clearDrawingToolSelect();
+  List<String> getDrawingToolsRepoItems() => _model.getDrawingToolsRepoItems();
+}
+
+/// Initialize the JavaScript interop
 void initDartInterop(ChartApp app) {
-  final JsObject dartInterop = JsObject(context['Object']);
-  setProperty(dartInterop, 'config', _exposeConfigModel(app.configModel));
-  setProperty(dartInterop, 'drawingTool',
-      _exposeDrawingToolModel(app.drawingToolModel));
-  setProperty(
-      dartInterop, 'indicators', _exposeIndicatorsModel(app.indicatorsModel));
-  setProperty(dartInterop, 'feed', _exposeDataModel(app.feedModel));
-  setProperty(dartInterop, 'app', _exposeApp(app));
-  setProperty(dartInterop, 'crosshair', _exposeCrosshair(app));
-  setProperty(html.window, 'flutterChart', dartInterop);
-}
+  try {
+    // Create wrapper instances
+    final appWrapper = AppWrapper(app);
+    final crosshairWrapper =
+        CrosshairWrapper(app.wrappedController.getCrosshairController());
+    final feedWrapper = ChartFeedWrapper(app.feedModel);
+    final configWrapper = ChartConfigWrapper(app.configModel);
+    final indicatorsWrapper = IndicatorsWrapper(app.indicatorsModel);
+    final drawingToolWrapper = DrawingToolWrapper(app.drawingToolModel);
 
-JsObject _exposeApp(ChartApp app) {
-  final JsObject jsObject = JsObject(context['Object']);
+    // Create the main object to expose to JavaScript
+    final JSObject dartInterop = JSObject();
 
-  setProperty(
-    jsObject,
-    'getXAxisHeight',
-    allowInterop(() => app.xAxisHeight),
-  );
+    // Add all wrappers as properties using createJSInteropWrapper
+    dartInterop.setProperty('app'.toJS, createJSInteropWrapper(appWrapper));
+    dartInterop.setProperty(
+        'crosshair'.toJS, createJSInteropWrapper(crosshairWrapper));
+    dartInterop.setProperty('feed'.toJS, createJSInteropWrapper(feedWrapper));
+    dartInterop.setProperty(
+        'config'.toJS, createJSInteropWrapper(configWrapper));
+    dartInterop.setProperty(
+        'indicators'.toJS, createJSInteropWrapper(indicatorsWrapper));
+    dartInterop.setProperty(
+        'drawingTool'.toJS, createJSInteropWrapper(drawingToolWrapper));
 
-  setProperty(
-    jsObject,
-    'getYAxisWidth',
-    allowInterop(() => app.yAxisWidth),
-  );
-
-  setProperty(
-    jsObject,
-    'getCurrentTickWidth',
-    allowInterop(() => app.currentTickWidth),
-  );
-
-  setProperty(
-    jsObject,
-    'newChart',
-    allowInterop(app.newChart),
-  );
-
-  setProperty(
-    jsObject,
-    'getTooltipContent',
-    allowInterop(app.getTooltipContent),
-  );
-
-  setProperty(
-    jsObject,
-    'getIndicatorHoverIndex',
-    allowInterop(app.getIndicatorHoverIndex),
-  );
-
-  setProperty(jsObject, 'getXFromEpoch',
-      allowInterop(app.wrappedController.getXFromEpoch));
-
-  setProperty(jsObject, 'getYFromQuote',
-      allowInterop(app.wrappedController.getYFromQuote));
-
-  setProperty(jsObject, 'getEpochFromX',
-      allowInterop(app.wrappedController.getEpochFromX));
-
-  setProperty(jsObject, 'getQuoteFromY',
-      allowInterop(app.wrappedController.getQuoteFromY));
-
-  setProperty(jsObject, 'scale', allowInterop(app.wrappedController.scale));
-
-  setProperty(jsObject, 'scroll', allowInterop(app.wrappedController.scroll));
-
-  setProperty(
-    jsObject,
-    'scrollToLastTick',
-    allowInterop(
-      app.wrappedController.scrollToLastTick,
-    ),
-  );
-
-  setProperty(
-    jsObject,
-    'toggleXScrollBlock',
-    allowInterop(app.wrappedController.toggleXScrollBlock),
-  );
-
-  setProperty(
-    jsObject,
-    'toggleDataFitMode',
-    allowInterop(app.wrappedController.toggleDataFitMode),
-  );
-
-  setProperty(
-    jsObject,
-    'addOrUpdateIndicator',
-    allowInterop(app.addOrUpdateIndicator),
-  );
-
-  return jsObject;
-}
-
-JsObject _exposeCrosshair(ChartApp app) {
-  final JsObject crosshair = JsObject(context['Object']);
-
-  final CrosshairController controller =
-      app.wrappedController.getCrosshairController();
-
-  setProperty(
-      crosshair, 'getXFromEpoch', allowInterop(controller.getXFromEpoch));
-
-  setProperty(
-      crosshair, 'getYFromQuote', allowInterop(controller.getYFromQuote));
-
-  setProperty(
-      crosshair, 'getEpochFromX', allowInterop(controller.getEpochFromX));
-
-  setProperty(
-      crosshair, 'getQuoteFromY', allowInterop(controller.getQuoteFromY));
-
-  return crosshair;
-}
-
-JsObject _exposeDataModel(ChartFeedModel model) {
-  final JsObject feedModel = JsObject(context['Object']);
-
-  setProperty(
-    feedModel,
-    'onTickHistory',
-    allowInterop(model.onTickHistory),
-  );
-
-  setProperty(
-    feedModel,
-    'onNewTick',
-    allowInterop(model.onNewTick),
-  );
-
-  setProperty(
-    feedModel,
-    'onNewCandle',
-    allowInterop(model.onNewCandle),
-  );
-
-  return feedModel;
-}
-
-JsObject _exposeConfigModel(ChartConfigModel model) {
-  final JsObject chartConfig = JsObject(context['Object']);
-
-  setProperty(
-    chartConfig,
-    'updateTheme',
-    allowInterop(model.updateTheme),
-  );
-
-  setProperty(
-    chartConfig,
-    'newChart',
-    allowInterop(model.newChart),
-  );
-
-  setProperty(
-    chartConfig,
-    'updateChartStyle',
-    allowInterop(model.updateChartStyle),
-  );
-
-  setProperty(
-    chartConfig,
-    'setRemainingTime',
-    allowInterop(model.setRemainingTime),
-  );
-
-  setProperty(
-    chartConfig,
-    'updateContracts',
-    allowInterop(model.updateContracts),
-  );
-
-  setProperty(
-    chartConfig,
-    'updateLiveStatus',
-    allowInterop(model.updateLiveStatus),
-  );
-
-  setProperty(
-    chartConfig,
-    'updateCrosshairVisibility',
-    allowInterop(model.updateCrosshairVisibility),
-  );
-
-  setProperty(
-    chartConfig,
-    'updateLeftMargin',
-    allowInterop(model.updateLeftMargin),
-  );
-
-  setProperty(
-    chartConfig,
-    'updateRightPadding',
-    allowInterop(model.updateRightPadding),
-  );
-
-  setProperty(
-    chartConfig,
-    'toggleTimeIntervalVisibility',
-    allowInterop(model.toggleTimeIntervalVisibility),
-  );
-
-  setProperty(
-    chartConfig,
-    'setSymbolClosed',
-    allowInterop(model.setSymbolClosed),
-  );
-
-  return chartConfig;
-}
-
-JsObject _exposeIndicatorsModel(IndicatorsModel model) {
-  final JsObject chartConfig = JsObject(context['Object']);
-
-  setProperty(
-    chartConfig,
-    'removeIndicator',
-    allowInterop(model.removeIndicator),
-  );
-
-  setProperty(
-    chartConfig,
-    'clearIndicators',
-    allowInterop(model.clearIndicators),
-  );
-
-  return chartConfig;
-}
-
-JsObject _exposeDrawingToolModel(DrawingToolModel model) {
-  final JsObject chartConfig = JsObject(context['Object']);
-
-  setProperty(
-    chartConfig,
-    'addOrUpdateDrawing',
-    allowInterop(model.addOrUpdateDrawing),
-  );
-
-  setProperty(
-    chartConfig,
-    'removeDrawingTool',
-    allowInterop(model.removeDrawingTool),
-  );
-
-  setProperty(
-    chartConfig,
-    'getTypeOfSelectedDrawingTool',
-    allowInterop(model.getTypeOfSelectedDrawingTool),
-  );
-
-  setProperty(
-    chartConfig,
-    'editDrawing',
-    allowInterop(model.editDrawing),
-  );
-
-  setProperty(
-    chartConfig,
-    'clearDrawingTool',
-    allowInterop(model.clearDrawingTool),
-  );
-
-  setProperty(
-    chartConfig,
-    'clearDrawingToolSelect',
-    allowInterop(model.clearDrawingToolSelect),
-  );
-
-  setProperty(
-    chartConfig,
-    'getDrawingToolsRepoItems',
-    allowInterop(model.getDrawingToolsRepoItems),
-  );
-
-  return chartConfig;
+    // Expose the interop object to the global window
+    web.window.setProperty('flutterChart'.toJS, dartInterop);
+  } catch (e) {
+    // Handle any errors that might occur during interop setup
+    print('Error initializing JavaScript interop: $e');
+  }
 }

@@ -48,6 +48,7 @@ const config = {
         },
     },
     module: {
+        noParse: [/main\.dart\.js$/, /canvaskit\/.*\.js$/],
         rules: [
             {
                 test: /\.svg$/,
@@ -177,6 +178,9 @@ const config = {
                     to: './chart',
                     globOptions: {
                         ignore: ['**/packages/**'],
+                    },
+                    transform(content, absoluteFrom) {
+                        return content;
                     },
                 },
             ],
