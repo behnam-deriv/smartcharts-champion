@@ -10,8 +10,7 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    deriv_chart:
-        path: ../../flutter-chart-fork
+    deriv_chart: ^0.3.9
     js: ^0.6.7
     web: ^1.1.1
 
