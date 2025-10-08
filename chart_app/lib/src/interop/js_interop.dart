@@ -116,6 +116,9 @@ class JSContractsUpdate {
 
   /// Direction of the markers
   external String direction;
+
+  /// Profit/Loss text to be shown in marker group
+  external String? profitAndLossText;
 }
 
 @JS()

@@ -137,6 +137,7 @@ class ChartConfigModel extends ChangeNotifier {
                 _getProperty(_markerGroup.props, 'contractMarkerLeftPadding'),
           ),
           currentEpoch: _markerGroup.currentEpoch,
+          profitAndLossText: _markerGroup.profitAndLossText,
         ),
       );
     }
