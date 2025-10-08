@@ -110,6 +110,12 @@ class JSContractsUpdate {
 
   /// Extra props needed to customize contract painting
   external JsObject? props;
+
+  /// Current epoch
+  external int? currentEpoch;
+
+  /// Direction of the markers
+  external String direction;
 }
 
 @JS()
