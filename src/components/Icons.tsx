@@ -235,36 +235,6 @@ import SettingHighestLowestLightActive from '../../sass/icons/setting/highest-lo
 import SettingHighestLowestDarkNormal from '../../sass/icons/setting/highest-lowest/ic-highest-lowest-dark-normal.svg';
 import SettingHighestLowestDarkActive from '../../sass/icons/setting/highest-lowest/ic-highest-lowest-dark-active.svg';
 
-import IndicatorCatMomentum from '../../sass/icons/indicators/ic-momentum.svg';
-import IndicatorCatTrendLight from '../../sass/icons/indicators/ic-trend-light.svg';
-import IndicatorCatTrendDark from '../../sass/icons/indicators/ic-trend-dark.svg';
-import IndicatorCatVolatility from '../../sass/icons/indicators/ic-volatility.svg';
-import IndicatorCatAverages from '../../sass/icons/indicators/ic-cat-averages.svg';
-import IndicatorCatOther from '../../sass/icons/indicators/ic-other.svg';
-
-import IndicatorAwesomeOscillator from '../../sass/icons/indicators/ic-awesome-oscillator.svg';
-import IndicatorDTrended from '../../sass/icons/indicators/ic-dtrended.svg';
-import IndicatorGator from '../../sass/icons/indicators/ic-gator.svg';
-import IndicatorMacd from '../../sass/icons/indicators/ic-macd.svg';
-import IndicatorRateChange from '../../sass/icons/indicators/ic-rate-of-change.svg';
-import IndicatorRSI from '../../sass/icons/indicators/ic-rsi.svg';
-import IndicatorStochasticOscillator from '../../sass/icons/indicators/ic-stochastic-oscillator.svg';
-import IndicatorStochasticMomentum from '../../sass/icons/indicators/ic-stochastic-momentum.svg';
-import IndicatorWilliamPercent from '../../sass/icons/indicators/ic-william-percent.svg';
-import IndicatorAroon from '../../sass/icons/indicators/ic-aroon.svg';
-import IndicatorAdx from '../../sass/icons/indicators/ic-adx.svg';
-import IndicatorCommodityChannelIndex from '../../sass/icons/indicators/ic-commodity-channel-index.svg';
-import IndicatorIchimoku from '../../sass/icons/indicators/ic-ichimoku.svg';
-import IndicatorParabolic from '../../sass/icons/indicators/ic-parabolic.svg';
-import IndicatorZigZag from '../../sass/icons/indicators/ic-zig-zag.svg';
-import IndicatorBollinger from '../../sass/icons/indicators/ic-bollinger.svg';
-import IndicatorDonchian from '../../sass/icons/indicators/ic-donchian.svg';
-import IndicatorAverages from '../../sass/icons/indicators/ic-averages.svg';
-import IndicatorEnvelope from '../../sass/icons/indicators/ic-envelope.svg';
-import IndicatorAlligator from '../../sass/icons/indicators/ic-alligator.svg';
-import IndicatorFractalChaos from '../../sass/icons/indicators/ic-fractal-chaos.svg';
-import IndicatorRainbow from '../../sass/icons/indicators/ic-rainbow.svg';
-
 import DrawToolsChannel from '../../sass/icons/draw-tools/ic-channel.svg';
 import DrawToolsContinuous from '../../sass/icons/draw-tools/ic-continuous.svg';
 import DrawToolsFibonaccifan from '../../sass/icons/draw-tools/ic-fibonacci-fan.svg';
@@ -274,6 +244,39 @@ import DrawToolsRay from '../../sass/icons/draw-tools/ic-ray.svg';
 import DrawToolsRectangle from '../../sass/icons/draw-tools/ic-rectangle.svg';
 import DrawToolsTrend from '../../sass/icons/draw-tools/ic-trend.svg';
 import DrawToolsVertical from '../../sass/icons/draw-tools/ic-vertical.svg';
+
+// Indicator icons moved to IndicatorIcons.tsx for lazy loading
+// Re-export from there for backwards compatibility
+export {
+    IndicatorCatMomentumIcon,
+    IndicatorCatTrendLightIcon,
+    IndicatorCatTrendDarkIcon,
+    IndicatorCatVolatilityIcon,
+    IndicatorCatAveragesIcon,
+    IndicatorCatOtherIcon,
+    IndicatorAwesomeOscillatorIcon,
+    IndicatorDTrendedIcon,
+    IndicatorGatorIcon,
+    IndicatorMacdIcon,
+    IndicatorRateChangeIcon,
+    IndicatorRSIIcon,
+    IndicatorStochasticOscillatorIcon,
+    IndicatorStochasticMomentumIcon,
+    IndicatorWilliamPercentIcon,
+    IndicatorAroonIcon,
+    IndicatorAdxIcon,
+    IndicatorCommodityChannelIndexIcon,
+    IndicatorIchimokuIcon,
+    IndicatorParabolicIcon,
+    IndicatorZigZagIcon,
+    IndicatorBollingerIcon,
+    IndicatorDonchianIcon,
+    IndicatorAveragesIcon,
+    IndicatorEnvelopeIcon,
+    IndicatorAlligatorIcon,
+    IndicatorFractalChaosIcon,
+    IndicatorRainbowIcon,
+} from './IndicatorIcons';
 
 export const Wrapper = (SvgLogo: React.SVGAttributes<SVGElement>) => {
     const InnerWrapper = (props: TIconProps) => {
@@ -381,35 +384,7 @@ export const TypeCandleGrayscaleIcon = Wrapper(TypeCandleGrayscale);
 export const TypeHollowGrayscaleIcon = Wrapper(TypeHollowGrayscale);
 export const TypeOhlcGrayscaleIcon = Wrapper(TypeOhlcGrayscale);
 
-export const IndicatorCatMomentumIcon = Wrapper(IndicatorCatMomentum);
-export const IndicatorCatTrendLightIcon = Wrapper(IndicatorCatTrendLight);
-export const IndicatorCatTrendDarkIcon = Wrapper(IndicatorCatTrendDark);
-export const IndicatorCatVolatilityIcon = Wrapper(IndicatorCatVolatility);
-export const IndicatorCatAveragesIcon = Wrapper(IndicatorCatAverages);
-export const IndicatorCatOtherIcon = Wrapper(IndicatorCatOther);
-
-export const IndicatorAwesomeOscillatorIcon = Wrapper(IndicatorAwesomeOscillator);
-export const IndicatorDTrendedIcon = Wrapper(IndicatorDTrended);
-export const IndicatorGatorIcon = Wrapper(IndicatorGator);
-export const IndicatorMacdIcon = Wrapper(IndicatorMacd);
-export const IndicatorRateChangeIcon = Wrapper(IndicatorRateChange);
-export const IndicatorRSIIcon = Wrapper(IndicatorRSI);
-export const IndicatorStochasticOscillatorIcon = Wrapper(IndicatorStochasticOscillator);
-export const IndicatorStochasticMomentumIcon = Wrapper(IndicatorStochasticMomentum);
-export const IndicatorWilliamPercentIcon = Wrapper(IndicatorWilliamPercent);
-export const IndicatorAroonIcon = Wrapper(IndicatorAroon);
-export const IndicatorAdxIcon = Wrapper(IndicatorAdx);
-export const IndicatorCommodityChannelIndexIcon = Wrapper(IndicatorCommodityChannelIndex);
-export const IndicatorIchimokuIcon = Wrapper(IndicatorIchimoku);
-export const IndicatorParabolicIcon = Wrapper(IndicatorParabolic);
-export const IndicatorZigZagIcon = Wrapper(IndicatorZigZag);
-export const IndicatorBollingerIcon = Wrapper(IndicatorBollinger);
-export const IndicatorDonchianIcon = Wrapper(IndicatorDonchian);
-export const IndicatorAveragesIcon = Wrapper(IndicatorAverages);
-export const IndicatorEnvelopeIcon = Wrapper(IndicatorEnvelope);
-export const IndicatorAlligatorIcon = Wrapper(IndicatorAlligator);
-export const IndicatorFractalChaosIcon = Wrapper(IndicatorFractalChaos);
-export const IndicatorRainbowIcon = Wrapper(IndicatorRainbow);
+// Indicator icon exports moved to top of file - re-exported from IndicatorIcons.tsx
 
 export const MetalIcon = Wrapper(Metal);
 export const EmptyStateIcon = Wrapper(EmptyState);

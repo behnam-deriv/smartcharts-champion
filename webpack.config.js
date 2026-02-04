@@ -26,7 +26,9 @@ const output = {
 };
 
 const config = {
-    devtool: 'source-map',
+    // Use hidden-source-map in production to generate maps without exposing them in the bundle
+    // This reduces main bundle size while still allowing error tracking services to use maps
+    devtool: production ? 'hidden-source-map' : 'source-map',
     entry: path.resolve(__dirname, './src/index.ts'),
     output,
     resolve: {
@@ -192,6 +194,8 @@ const config = {
         }),
         new ForkTsCheckerWebpackPlugin(),
     ],
+    // Externals configuration - library mode externalizes all deps
+    // App mode will override this to bundle mobx-react-lite (avoids UMD shim issues)
     externals: {
         react: {
             root: 'React',
@@ -213,6 +217,16 @@ const config = {
             root: 'dayjs',
             commonjs: 'dayjs',
             commonjs2: 'dayjs',
+        },
+        mobx: {
+            root: 'mobx',
+            commonjs: 'mobx',
+            commonjs2: 'mobx',
+        },
+        'mobx-react-lite': {
+            root: 'mobxReactLite',
+            commonjs: 'mobx-react-lite',
+            commonjs2: 'mobx-react-lite',
         },
     },
 };
@@ -248,15 +262,55 @@ if (production) {
         ],
         splitChunks: {
             chunks: 'async', // Only split async chunks to maintain UMD compatibility
+            minSize: 20000, // Minimum size for a chunk (20KB)
             maxSize: 244000, // Split chunks larger than ~240KB
             cacheGroups: {
                 // Translation files can be split as they're loaded async
                 translations: {
                     test: /\.po$/,
                     name: 'translations',
-                    priority: 15,
+                    priority: 20,
                     chunks: 'all',
                 },
+                // Split html2canvas into its own chunk (already lazy-loaded)
+                html2canvas: {
+                    test: /[\\/]node_modules[\\/]html2canvas[\\/]/,
+                    name: 'html2canvas',
+                    chunks: 'async',
+                    priority: 15,
+                },
+                // Split lz-string into its own chunk (lazy-loaded in ChartState.ts)
+                lzstring: {
+                    test: /[\\/]node_modules[\\/]lz-string[\\/]/,
+                    name: 'lz-string',
+                    chunks: 'async',
+                    priority: 15,
+                },
+                // Split resize-observer-polyfill (lazy-loaded in ChartStore.ts)
+                resizeObserver: {
+                    test: /[\\/]node_modules[\\/]resize-observer-polyfill[\\/]/,
+                    name: 'resize-observer-polyfill',
+                    chunks: 'async',
+                    priority: 15,
+                },
+                // Split classnames utility (used across components)
+                classnames: {
+                    test: /[\\/]node_modules[\\/]classnames[\\/]/,
+                    name: 'classnames',
+                    chunks: 'async',
+                    priority: 10,
+                    minSize: 0,
+                },
+                // Split lodash-es utilities if used
+                lodash: {
+                    test: /[\\/]node_modules[\\/]lodash-es[\\/]/,
+                    name: 'lodash-es',
+                    chunks: 'async',
+                    priority: 10,
+                },
+                // Note: StudyLegendStore and DrawToolsStore are synchronously imported
+                // in MainStore, so they cannot be split without refactoring to lazy-load.
+                // Consider lazy-loading these stores in the future for further optimization.
             },
         },
         concatenateModules: true, // Enable module concatenation (scope hoisting)
@@ -271,6 +325,12 @@ if (process.env.ANALYZE_BUNDLE) {
 
 if (isApp) {
     config.entry = path.resolve(__dirname, `./app/${appEntryFile}.tsx`);
+
+    // Remove mobx-react-lite from externals in app mode
+    // This lets webpack bundle it with its use-sync-external-store dependency
+    // avoiding the UMD shim compatibility issue with React 18
+    delete config.externals['mobx-react-lite'];
+
     config.plugins.push(
         new CopyWebpackPlugin({
             patterns: [
@@ -296,12 +356,8 @@ if (isApp) {
                         : './node_modules/mobx/dist/mobx.umd.development.js',
                     to: 'mobx.js',
                 },
-                {
-                    from: production
-                        ? './node_modules/mobx-react-lite/dist/mobxreactlite.umd.production.min.js'
-                        : './node_modules/mobx-react-lite/dist/mobxreactlite.umd.development.js',
-                    to: 'mobx-react-lite.js',
-                },
+                // mobx-react-lite UMD removed - now bundled by webpack to avoid
+                // use-sync-external-store shim compatibility issues with React 18
                 {
                     from: './node_modules/react-transition-group/dist/react-transition-group.js',
                     to: 'react-transition-group.js',

@@ -9,6 +9,14 @@ import {
     // DrawToolsTrendIcon,
     DrawToolsVerticalIcon,
     FlagIcons,
+    // Chart Types
+    TypeAreaIcon,
+    TypeCandleIcon,
+    TypeHollowIcon,
+    TypeOhlcIcon,
+} from './components/Icons';
+// Indicator icons imported from separate file for better tree-shaking
+import {
     IndicatorAdxIcon,
     IndicatorAlligatorIcon,
     IndicatorAroonIcon,
@@ -36,12 +44,7 @@ import {
     IndicatorStochasticOscillatorIcon,
     IndicatorWilliamPercentIcon,
     IndicatorZigZagIcon,
-    // Chart Types
-    TypeAreaIcon,
-    TypeCandleIcon,
-    TypeHollowIcon,
-    TypeOhlcIcon,
-} from './components/Icons';
+} from './components/IndicatorIcons';
 import {
     TGranularity,
     TIcon,

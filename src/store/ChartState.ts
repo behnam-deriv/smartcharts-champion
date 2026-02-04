@@ -9,10 +9,9 @@ import {
     TLayout,
     TSettings,
 } from 'src/types';
-import debounce from 'lodash-es/debounce';
 import { AuditDetailsForExpiredContract, ProposalOpenContract } from 'src/types/api-types';
 import { isDeepEqual } from 'src/utils/object';
-import LZString from 'lz-string';
+import { debounce } from '../utils/lodash-lite';
 import MainStore from '.';
 import Theme from '../../sass/_themes.scss';
 import { STATE } from '../Constant';
@@ -24,6 +23,18 @@ import {
 } from '../utils';
 import ChartStore from './ChartStore';
 import { processSymbols, categorizeActiveSymbols } from '../utils/active-symbols';
+
+// Lazy-load lz-string to reduce main bundle by ~59KB
+// LZString is only needed for layout compression/decompression
+type LZStringModule = typeof import('lz-string');
+let _lzStringModule: LZStringModule | null = null;
+
+const getLZString = async (): Promise<LZStringModule> => {
+    if (!_lzStringModule) {
+        _lzStringModule = await import(/* webpackChunkName: "lz-string" */ 'lz-string');
+    }
+    return _lzStringModule;
+};
 
 type TStateChangeOption = {
     indicator_type_name?: string;
@@ -500,11 +511,12 @@ class ChartState {
         this.shouldMinimiseLastDigits = status;
     }
 
-    saveLayout() {
+    async saveLayout() {
         if (!this.chartStore.chartId) return;
         const layoutData: TLayout = this.mainStore.view.getLayout();
         const id = this.mainStore.chart.chartId;
 
+        const LZString = await getLZString();
         const layoutCompressedData = LZString.compress(
             JSON.stringify({
                 studyItems: layoutData.studyItems,
@@ -515,13 +527,14 @@ class ChartState {
         saveToLocalStorage(`chart-layout-${id}`, layoutCompressedData);
     }
     // returns false if restoring layout fails
-    restoreLayout() {
+    async restoreLayout() {
         const id = this.mainStore.chart.chartId;
         const compressedLayout = createObjectFromLocalStorage(`chart-layout-${id}`);
-        
+
         let layout: TLayout | null = null;
         try {
-            layout = JSON.parse(LZString.decompress(compressedLayout ?? ''));
+            const LZString = await getLZString();
+            layout = JSON.parse(LZString.decompress(compressedLayout ?? '') || '');
         } catch (e) {
             layout = compressedLayout;
         }
@@ -541,10 +554,12 @@ class ChartState {
         window.flutterChart?.drawingTool.clearDrawingTool();
     }
 
-    saveDrawings() {
+    async saveDrawings() {
         if (!this.chartStore.chartId) return;
         const layoutData: TLayout = this.mainStore.view.getLayout();
         const id = this.mainStore.chart.chartId;
+
+        const LZString = await getLZString();
         const layoutCompressedData = LZString.compress(
             JSON.stringify({
                 studyItems: layoutData.studyItems,

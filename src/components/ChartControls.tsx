@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import { TChartControlsWidgets } from 'src/types';
@@ -8,8 +9,10 @@ import CrosshairToggle from './CrosshairToggle';
 import Timeperiod from './Timeperiod';
 import ChartSize from './ChartSize';
 import DrawTools from './DrawTools';
-import Share from './Share';
 import '../../sass/components/_chart-controls.scss';
+// Lazy-load Share component to reduce initial bundle size
+// Share is only needed when user clicks download
+const Share = React.lazy(() => import(/* webpackChunkName: "share-export" */ './Share'));
 
 type TRenderDefaultControls = { isMobile?: boolean };
 
@@ -20,7 +23,9 @@ export const RenderDefaultControls = ({ isMobile }: TRenderDefaultControls) => (
         <Timeperiod />
         <StudyLegend />
         <DrawTools />
-        <Share />
+        <Suspense fallback={null}>
+            <Share />
+        </Suspense>
         {isMobile ? '' : <ChartSize />}
     </>
 );

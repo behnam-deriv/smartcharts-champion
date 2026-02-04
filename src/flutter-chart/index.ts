@@ -39,7 +39,8 @@ export const createChartElement = ({ onChartLoad }: TCreateChartElementProps) =>
     };
 
     // @ts-expect-error chart dynamic load
-    import(/* webpackChunkName: "flutter-chart-adapter", webpackPreload: true */ 'chart/main.dart.js');
+    // Removed webpackPreload to prevent 5MB unnecessary preload for users not using Flutter chart
+    import(/* webpackChunkName: "flutter-chart-adapter" */ 'chart/main.dart.js');
 
     return flutterChartElement;
 };
