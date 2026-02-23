@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:chart_app/src/interop/js_interop.dart';
 import 'package:chart_app/src/misc/wrapped_controller.dart';
@@ -7,7 +6,7 @@ import 'package:chart_app/src/models/chart_config.dart';
 import 'package:chart_app/src/models/chart_feed.dart';
 import 'package:chart_app/src/models/drawing_tool.dart';
 import 'package:chart_app/src/models/indicators.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 import 'package:flutter/material.dart';
 
 /// ChartApp

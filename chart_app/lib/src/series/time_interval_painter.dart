@@ -1,5 +1,5 @@
 import 'package:chart_app/src/series/time_interval_indicator.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 import 'package:flutter/material.dart';
 
 /// A class for painting horizontal barriers.

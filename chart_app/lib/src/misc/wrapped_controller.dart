@@ -1,5 +1,5 @@
 import 'package:chart_app/src/misc/crosshair_controller.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 
 // ignore_for_file: avoid_catches_without_on_clauses
 

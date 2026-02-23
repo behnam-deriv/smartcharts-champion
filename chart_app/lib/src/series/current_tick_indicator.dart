@@ -1,4 +1,4 @@
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 
 /// CurrentTickIndicator
 class CurrentTickIndicator extends TickIndicator {

@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:chart_app/src/misc/wrapped_controller.dart';
 
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 import 'package:chart_app/src/interop/js_interop.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -46,9 +46,9 @@ class IndicatorsModel {
     // and then the Dart side calls back to JavaScript through onRemove
     final onRemoveCallback = indicatorsRepo.onDeleteCallback;
     indicatorsRepo.onDeleteCallback = null;
-    
+
     indicatorsRepo.removeAt(index);
-    
+
     // Restore the callback after removing the indicator
     indicatorsRepo.onDeleteCallback = onRemoveCallback;
   }

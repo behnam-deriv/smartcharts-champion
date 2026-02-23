@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chart_app/src/interop/js_interop.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
+
 /// State and methods of chart web adapter config.
 class DrawingToolModel {
   /// Initialize
@@ -12,9 +13,9 @@ class DrawingToolModel {
       createAddOn: (Map<String, dynamic> map) =>
           DrawingToolConfig.fromJson(map),
       onDeleteCallback: (AddOnConfig item, int index) {
-        final Map<String, dynamic> config = item.toJson(); 
+        final Map<String, dynamic> config = item.toJson();
         // Convert the config to a JSON string and then parse it back to ensure it's properly serialized
-        final String jsonConfigString = jsonEncode(config); 
+        final String jsonConfigString = jsonEncode(config);
         // Pass both the name and the full config object
         JsInterop.drawingTool?.onRemove?.call(config['name'], jsonConfigString);
       },
@@ -129,14 +130,15 @@ class DrawingToolModel {
             // The native repository should automatically save to SharedPreferences
             // Just sync with JavaScript side by calling onLoad with current items
             final List<String> drawingToolsJson = getDrawingToolsRepoItems();
-            
+
             // Get the last added drawing tool and inform JavaScript side about it
             if (drawingToolsRepo.items.isNotEmpty) {
-              final DrawingToolConfig lastAddedTool = drawingToolsRepo.items.last;
+              final DrawingToolConfig lastAddedTool =
+                  drawingToolsRepo.items.last;
               final String configJson = jsonEncode(lastAddedTool);
               JsInterop.drawingTool?.onToolAdded?.call(configJson);
             }
-            
+
             JsInterop.drawingTool?.onLoad?.call(drawingToolsJson);
 
             // Trigger update to refresh the UI count and display

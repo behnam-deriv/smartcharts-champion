@@ -1,5 +1,5 @@
 import 'package:chart_app/src/painters/blink_tick_painter.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 
 /// BlinkingTickIndicator
 class BlinkingTickIndicator extends TickIndicator {

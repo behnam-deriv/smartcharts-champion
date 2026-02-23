@@ -5,7 +5,7 @@ import 'package:chart_app/src/helpers/color.dart';
 import 'package:chart_app/src/misc/no_navigation_strategy.dart';
 import 'package:chart_app/src/models/drawing_tool.dart';
 import 'package:chart_app/src/models/indicators.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 // ignore: avoid_web_libraries_in_flutter

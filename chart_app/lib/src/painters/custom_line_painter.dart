@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:chart_app/src/interop/js_interop.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 import 'package:flutter/material.dart';
 
 /// CustomLinePainter

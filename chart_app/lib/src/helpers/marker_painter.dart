@@ -1,5 +1,5 @@
 import 'package:chart_app/src/chart_app.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 
 /// Gets painter for a contract based on the contract type
 MarkerGroupIconPainter getMarkerGroupPainter(ChartApp app) {

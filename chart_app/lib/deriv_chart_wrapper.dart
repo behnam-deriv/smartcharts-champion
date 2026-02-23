@@ -13,7 +13,7 @@ import 'package:chart_app/src/models/indicators.dart';
 import 'package:chart_app/src/series/blink_tick_indicator.dart';
 import 'package:chart_app/src/series/current_tick_indicator.dart';
 import 'package:chart_app/src/series/time_interval_indicator.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // ignore: avoid_web_libraries_in_flutter

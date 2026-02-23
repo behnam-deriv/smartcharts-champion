@@ -1,7 +1,7 @@
 import 'package:chart_app/src/models/chart_config.dart';
 import 'package:chart_app/src/models/chart_feed.dart';
 import 'package:chart_app/src/series/custom_line_series.dart';
-import 'package:deriv_chart/deriv_chart.dart';
+import 'package:deriv_chart/core_chart.dart';
 
 /// Gets the data series
 DataSeries<Tick> getDataSeries(
