@@ -180,6 +180,8 @@
     },
     "overrides": {
         "braces": "^3.0.3",
+        "lodash": "^4.17.23",
+        "tmp": "^0.2.4",
         "webpack-bundle-analyzer": {
             "ws": "^8.18.2"
         }
