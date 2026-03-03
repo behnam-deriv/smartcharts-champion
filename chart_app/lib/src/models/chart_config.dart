@@ -109,6 +109,7 @@ class ChartConfigModel extends ChangeNotifier {
             color: _marker.color != null
                 ? getColorFromString(_marker.color!)
                 : null,
+            displayOffset: _getDisplayOffset(_marker),
           ));
         }
       }
@@ -146,6 +147,11 @@ class ChartConfigModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Offset _getDisplayOffset(JsMarker marker) => Offset(
+        marker.displayOffsetX ?? 0,
+        marker.displayOffsetY ?? 0,
+      );
 
   /// To update the theme of the chart
   void updateTheme(String _theme) {

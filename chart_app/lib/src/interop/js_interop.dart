@@ -146,6 +146,13 @@ class JsMarker {
 
   /// Marker direction
   external String? get direction;
+
+  /// Horizontal pixel offset for the marker's rendered position.
+  external double? get displayOffsetX;
+
+  /// Vertical pixel offset for the marker's rendered position.
+  /// Negative values move the marker upward.
+  external double? get displayOffsetY;
 }
 
 @JS()
