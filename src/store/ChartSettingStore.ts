@@ -18,7 +18,7 @@ export default class ChartSettingStore {
     historical = false;
     isAutoScale = true;
     isHighestLowestMarkerEnabled = true;
-    isSmoothChartEnabled = false;
+    isSmoothChartEnabled = true;
     minimumLeftBars?: number;
     whitespace?: number;
 
