@@ -39,7 +39,7 @@ class ChartStore {
     static processedSymbols: TProcessedSymbolItem[];
     static symbolMap: Record<string, TProcessedSymbolItem> = {};
     static categorizedSymbols: TCategorizedSymbolItem<TSubCategoryDataItem>[] = [];
-    
+
     chartContainerHeight?: number;
     chartHeight?: number;
     chartId?: string;
@@ -62,11 +62,13 @@ class ChartStore {
     shouldRenderDialogs = false;
     leftMargin?: number;
     lastQuote?: TQuote;
-    
+    private _chartRequestId = 0;
+    private loaderTimeout?: ReturnType<typeof setTimeout>;
+
     processedSymbols?: TProcessedSymbolItem[];
     symbolMap: Record<string, TProcessedSymbolItem> = {};
     categorizedSymbols: TCategorizedSymbolItem<TSubCategoryDataItem>[] = [];
-    
+
     constructor(mainStore: MainStore) {
         makeObservable(this, {
             chartContainerHeight: observable,
@@ -268,12 +270,12 @@ class ChartStore {
 
         this.feedCall = feedCall || {};
         this.api = new BinaryAPI(
-            unsubscribeQuotes, 
+            unsubscribeQuotes,
             getQuotes || (async () => ({
                 candles: [],
                 echo_req: {},
-            })), 
-            subscribeQuotes || (() => (() => { /* Empty function */ })), 
+            })),
+            subscribeQuotes || (() => (() => { /* Empty function */ })),
         );
         this.currentLanguage = localStorage.getItem('current_chart_lang') ?? settings?.language?.toLowerCase();
         // trading times and active symbols can be reused across multiple charts
@@ -292,13 +294,13 @@ class ChartStore {
             const processedSymbols = processSymbols(activeSymbols);
             this.processedSymbols = processedSymbols;
             this.categorizedSymbols = categorizeActiveSymbols(processedSymbols);
-            
+
             // Create symbol map for quick lookup
             this.symbolMap = {};
             for (const symbolObj of processedSymbols) {
                 this.symbolMap[symbolObj.symbol] = symbolObj;
             }
-            
+
             // Store in static properties for reuse
             ChartStore.processedSymbols = processedSymbols;
             ChartStore.symbolMap = this.symbolMap;
@@ -309,7 +311,7 @@ class ChartStore {
             this.symbolMap = ChartStore.symbolMap;
             this.categorizedSymbols = ChartStore.categorizedSymbols;
         }
-        
+
         const { chartSetting } = this.mainStore;
         chartSetting.setSettings(settings);
         chartSetting.onSettingsChange = onSettingsChange;
@@ -333,63 +335,63 @@ class ChartStore {
         const context = new Context(this.rootNode);
         this.stateStore.stateChange(STATE.INITIAL);
         this.loader.setState('market-symbol');
-        
-            this.loader.setState('trading-time');
-            this.tradingTimes?.initialize().then(
-                action(() => {
-                    // In the odd event that chart is destroyed by the time
-                    // the request finishes, just calmly return...
-                    if (this.isDestroyed) {
-                        return;
-                    }
-                    if (this.startWithDataFitMode) {
-                        this.state?.clearLayout();
-                    } else {
-                        this.state?.restoreLayout();
-                    }
 
-                    const _symbol = this.state?.symbol || symbol;
+        this.loader.setState('trading-time');
+        this.tradingTimes?.initialize().then(
+            action(() => {
+                // In the odd event that chart is destroyed by the time
+                // the request finishes, just calmly return...
+                if (this.isDestroyed) {
+                    return;
+                }
+                if (this.startWithDataFitMode) {
+                    this.state?.clearLayout();
+                } else {
+                    this.state?.restoreLayout();
+                }
 
-                    this.changeSymbol(
-                        // default to first available symbol
-                        _symbol || (this.symbolMap && Object.keys(this.symbolMap)[0]),
-                        this.granularity
-                    );
-                    this.context = context;
-                    this.chartClosedOpenThemeChange(!this.currentActiveSymbol?.exchange_is_open);
-                    this.mainStore.chart.tradingTimes?.onMarketOpenCloseChanged(
-                        action((changes: TChanges) => {
-                            for (const sy in changes) {
-                                if (this.currentActiveSymbol?.symbol === sy) {
-                                    this.chartClosedOpenThemeChange(!changes[sy]);
-                                }
-                            }
-                        })
-                    );
+                const _symbol = this.state?.symbol || symbol;
 
-                    this.contextPromise?.resolve?.(this.context);
-                    this.resizeScreen();
-
-                    reaction(
-                        () => [this.state?.symbol, this.state?.granularity],
-                        () => {
-                            if (this.state?.symbol !== undefined || this.state?.granularity !== undefined) {
-                                this.changeSymbol(this.state.symbol, this.state.granularity);
+                this.changeSymbol(
+                    // default to first available symbol
+                    _symbol || (this.symbolMap && Object.keys(this.symbolMap)[0]),
+                    this.granularity
+                );
+                this.context = context;
+                this.chartClosedOpenThemeChange(!this.currentActiveSymbol?.exchange_is_open);
+                this.mainStore.chart.tradingTimes?.onMarketOpenCloseChanged(
+                    action((changes: TChanges) => {
+                        for (const sy in changes) {
+                            if (this.currentActiveSymbol?.symbol === sy) {
+                                this.chartClosedOpenThemeChange(!changes[sy]);
                             }
                         }
-                    );
-                    this.tradingTimes?.onTimeChanged(this.onServerTimeChange);
-                    setTimeout(
-                        action(() => {
-                            // Defer the render of the dialogs and dropdowns; this enables
-                            // considerable performance improvements for slower devices.
-                            this.shouldRenderDialogs = true;
-                        }),
-                        500
-                    );
-                })
-            );
-        
+                    })
+                );
+
+                this.contextPromise?.resolve?.(this.context);
+                this.resizeScreen();
+
+                reaction(
+                    () => [this.state?.symbol, this.state?.granularity],
+                    () => {
+                        if (this.state?.symbol !== undefined || this.state?.granularity !== undefined) {
+                            this.changeSymbol(this.state.symbol, this.state.granularity);
+                        }
+                    }
+                );
+                this.tradingTimes?.onTimeChanged(this.onServerTimeChange);
+                setTimeout(
+                    action(() => {
+                        // Defer the render of the dialogs and dropdowns; this enables
+                        // considerable performance improvements for slower devices.
+                        this.shouldRenderDialogs = true;
+                    }),
+                    500
+                );
+            })
+        );
+
     }
     setResizeEvent = () => {
         const listener = (entries: ResizeObserverEntry[]) => {
@@ -440,7 +442,7 @@ class ChartStore {
         this.mainStore.state.setChartTheme(this.mainStore.chartSetting.theme);
         this.mainStore.chartAdapter.setSymbolClosed(isChartClosed);
     }
-    
+
     onServerTimeChange() {
         if (this.tradingTimes?._serverTime) {
             this.serverTime = dayjs(this.tradingTimes._serverTime.getEpoch() * 1000).format(
@@ -492,9 +494,20 @@ class ChartStore {
             this.feed?.unsubscribe({ symbol: this.currentActiveSymbol.symbol, granularity: this.granularity });
         }
 
-        this.loader.show();
+        // Keep old chart data visible while new symbol data is being fetched.
+        // newChart() (which clears the Flutter chart) is deferred to the callback
+        // so the transition from old to new data is atomic and imperceptible.
         this.mainStore.state.setChartIsReady(false);
+        const requestId = ++this._chartRequestId;
+        // Show the chart loader only if it takes long enough.
+        // For fast responses the old chart data stays visible with no loading flash.
+        clearTimeout(this.loaderTimeout);
+        this.loaderTimeout = setTimeout(() => {
+            this.loader.setState('chart-data');
+            this.loader.show();
+        }, 2500);
         const onChartLoad = (err: string) => {
+            clearTimeout(this.loaderTimeout);
             this.loader.hide();
             this.chartClosedOpenThemeChange(!symbolObj.exchange_is_open);
             this.mainStore.paginationLoader.updateOnPagination(false);
@@ -506,7 +519,6 @@ class ChartStore {
             }
         };
 
-        this.mainStore.chartAdapter.newChart();
         this.feed?.fetchInitialData(
             symbolObj.symbol,
             {
@@ -514,6 +526,9 @@ class ChartStore {
                 symbolObject: symbolObj,
             },
             ({ quotes, error }: TPaginationCallbackParams) => {
+                if (requestId !== this._chartRequestId) return;
+                // Clear old chart and load new data atomically to avoid a blank/loading state.
+                this.mainStore.chartAdapter.newChart();
                 this.mainStore.chartAdapter.onTickHistory(quotes || []);
                 this.mainStore.chart.feed?.offMasterDataUpdate(this.mainStore.chartAdapter.onTick);
                 this.mainStore.chart.feed?.onMasterDataUpdate(this.mainStore.chartAdapter.onTick);
@@ -535,6 +550,7 @@ class ChartStore {
     destroy() {
         ChartStore.chartCount -= 1;
         this.isDestroyed = true;
+        clearTimeout(this.loaderTimeout);
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
         }
