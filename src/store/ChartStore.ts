@@ -525,11 +525,12 @@ class ChartStore {
                 granularity: this.mainStore.state.granularity,
                 symbolObject: symbolObj,
             },
-            ({ quotes, error }: TPaginationCallbackParams) => {
+            async ({ quotes, error }: TPaginationCallbackParams) => {
                 if (requestId !== this._chartRequestId) return;
                 // Clear old chart and load new data atomically to avoid a blank/loading state.
-                this.mainStore.chartAdapter.newChart();
-                this.mainStore.chartAdapter.onTickHistory(quotes || []);
+                await this.mainStore.chartAdapter.newChart();
+                await this.mainStore.chartAdapter.onTickHistory(quotes || []);
+                this.mainStore.chartAdapter.flutterChart?.app.scrollToLastTick();
                 this.mainStore.chart.feed?.offMasterDataUpdate(this.mainStore.chartAdapter.onTick);
                 this.mainStore.chart.feed?.onMasterDataUpdate(this.mainStore.chartAdapter.onTick);
                 onChartLoad(error as string);

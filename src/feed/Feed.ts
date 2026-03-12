@@ -302,16 +302,21 @@ class Feed {
                 return;
             }
             subscription.onChartData((tickResponse: TQuote[]) => {
-                // Append comming ticks to chart only if it belongs to selected symbol after symbol changes
-                if (symbol === this._mainStore.chart.currentActiveSymbol?.symbol && !this.hasAlternativeSource) {
+                // Append comming ticks to chart only if it belongs to selected symbol and granularity after changes
+                if (
+                    symbol === this._mainStore.chart.currentActiveSymbol?.symbol &&
+                    granularity === this._mainStore.chart.granularity &&
+                    !this.hasAlternativeSource
+                ) {
                     this._appendChartData(tickResponse, key);
                 }
             });
 
-            // if symbol is changed before request is completed, past request needs to be forgotten:
+            // if symbol or granularity is changed before request is completed, past request needs to be forgotten:
             if (
                 this._mainStore.chart.isDestroyed ||
-                (this._mainStore.state.symbol && this._mainStore.state.symbol !== symbol)
+                (this._mainStore.state.symbol && this._mainStore.state.symbol !== symbol) ||
+                granularity !== this._mainStore.chart.granularity
             ) {
                 callback({ quotes: [] });
                 subscription.forget();
