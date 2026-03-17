@@ -184,7 +184,8 @@
         "tmp": "^0.2.4",
         "webpack-bundle-analyzer": {
             "ws": "^8.18.2"
-        }
+        },
+        "serialize-javascript": ">=7.0.3"
     },
     "husky": {
         "hooks": {
