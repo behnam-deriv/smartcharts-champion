@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:js_interop';
 import 'package:chart_app/deriv_chart_wrapper.dart';
 import 'package:chart_app/src/chart_app.dart';
 import 'package:chart_app/src/helpers/color.dart';
@@ -8,15 +9,12 @@ import 'package:chart_app/src/models/indicators.dart';
 import 'package:deriv_chart/core_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 import 'src/models/chart_feed.dart';
 import 'src/models/chart_config.dart';
 import 'src/interop/dart_interop.dart';
 import 'src/interop/js_interop.dart';
-
-// ignore_for_file: avoid_catches_without_on_clauses
 
 void main() {
   setUrlStrategy(NoNavigationStrategy());
@@ -32,7 +30,7 @@ class DerivChartApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
         theme: ThemeData(fontFamily: 'IBMPlexSans'),
         home: const _DerivChartWebAdapter(),
-        title: html.document.title,
+        title: web.document.title,
       );
 }
 
@@ -61,21 +59,22 @@ class _DerivChartWebAdapterState extends State<_DerivChartWebAdapter> {
   final DrawingToolModel drawingToolModel = DrawingToolModel();
 
   late ChartApp app;
+  late final JSExportedDartFunction _jsVisibilityHandler;
   int? leftBoundEpoch, rightBoundEpoch;
   bool isFollowMode = false;
 
-  void onVisibilityChange(html.Event ev) {
+  void _handleVisibilityChange(web.Event event) {
     if (configModel.startWithDataFitMode || feedModel.ticks.isEmpty) {
       return;
     }
 
-    if (html.document.visibilityState == 'visible' && isFollowMode) {
+    if (web.document.visibilityState == 'visible' && isFollowMode) {
       Timer(const Duration(milliseconds: 100), () {
         app.wrappedController.scrollToLastTick();
       });
     }
 
-    if (html.document.visibilityState == 'hidden' && rightBoundEpoch != null) {
+    if (web.document.visibilityState == 'hidden' && rightBoundEpoch != null) {
       isFollowMode = rightBoundEpoch! > feedModel.ticks.last.epoch;
     }
   }
@@ -88,13 +87,15 @@ class _DerivChartWebAdapterState extends State<_DerivChartWebAdapter> {
   @override
   void initState() {
     super.initState();
-    html.document.addEventListener('visibilitychange', onVisibilityChange);
+    _jsVisibilityHandler = _handleVisibilityChange.toJS;
+    web.document.addEventListener('visibilitychange', _jsVisibilityHandler);
   }
 
   @override
   void dispose() {
+    web.document
+        .removeEventListener('visibilitychange', _jsVisibilityHandler);
     super.dispose();
-    html.document.removeEventListener('visibilitychange', onVisibilityChange);
   }
 
   @override

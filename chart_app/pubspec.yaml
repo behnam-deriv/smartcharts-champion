@@ -1,11 +1,11 @@
 name: chart_app
 description: Chart App
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
-    sdk: '>=3.3.3 <4.0.0'
-    flutter: '3.24.1'
+    sdk: ">=3.3.3 <4.0.0"
+    flutter: "3.24.1"
 
 dependencies:
     flutter:
@@ -14,7 +14,7 @@ dependencies:
         git:
             url: https://github.com/deriv-com/flutter-chart.git
             ref: master
-    js: ^0.6.7
+    web: ^1.1.1
 
 dev_dependencies:
     deriv_lint:

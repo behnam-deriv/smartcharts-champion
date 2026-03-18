@@ -1,5 +1,6 @@
-import 'dart:js';
-import 'dart:js_util';
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+
 import 'package:chart_app/src/helpers/color.dart';
 import 'package:deriv_chart/core_chart.dart';
 import 'package:flutter/material.dart';
@@ -240,11 +241,11 @@ class ChartConfigModel extends ChangeNotifier {
   /// from JavaScript objects
   /// passed from the web side, particularly for marker properties in the
   /// chart configuration.
-  dynamic _getProperty(JsObject? props, String targetPropName) {
+  dynamic _getProperty(JSObject? props, String targetPropName) {
     if (props == null) {
       return null;
     }
 
-    return getProperty(props, targetPropName);
+    return props.getProperty(targetPropName.toJS);
   }
 }
