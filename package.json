@@ -185,7 +185,10 @@
         "webpack-bundle-analyzer": {
             "ws": "^8.18.2"
         },
-        "serialize-javascript": ">=7.0.3"
+        "serialize-javascript": ">=7.0.3",
+        "svg-baker": {
+            "postcss": ">=8.4.31"
+        }
     },
     "husky": {
         "hooks": {
