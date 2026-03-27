@@ -22,14 +22,31 @@ declare global {
         flutterChartElement: HTMLElement;
         _flutter: {
             loader: {
-                didCreateEngineInitializer: (engineInitializer: TEngineInitializer) => void;
+                /** New Flutter 3.x API — handles WASM + JS build selection */
+                load: (config: {
+                    onEntrypointLoaded?: (engineInitializer: TEngineInitializer) => void;
+                    config?: Partial<TFlutterChartConfiguration>;
+                    serviceWorkerSettings?: { serviceWorkerVersion: string };
+                }) => Promise<void>;
+                /** Old Flutter 2.x API — kept for dart2js canvaskit fallback path */
+                didCreateEngineInitializer?: (engineInitializer: TEngineInitializer) => void;
+            };
+            buildConfig?: {
+                engineRevision?: string;
+                builds: Array<{
+                    compileTarget: 'dart2wasm' | 'dart2js';
+                    renderer: 'skwasm' | 'canvaskit' | 'html';
+                    mainWasmPath?: string;
+                    jsSupportRuntimePath?: string;
+                    mainJsPath?: string;
+                }>;
             };
             appRunner?: {
                 runApp: () => void;
             };
             initState: {
                 isInitialRunCompleted: boolean;
-                isEngineIntialized: boolean;
+                isEngineInitialized: boolean;
                 isMounted: boolean;
             };
         };
@@ -43,8 +60,12 @@ export type TAppRunner = {
 
 export type TFlutterChartConfiguration = {
     hostElement?: HTMLElement;
-    renderer?: 'html' | 'canvaskit';
+    renderer?: 'html' | 'canvaskit' | 'skwasm';
     assetBase?: string;
+    /** Base URL for loading main.dart.wasm, main.dart.mjs, main.dart.js */
+    entryPointBaseUrl?: string;
+    /** Base URL for canvaskit assets; defaults to "canvaskit" relative to page root */
+    canvasKitBaseUrl?: string;
 };
 
 export type TEngineInitializer = {

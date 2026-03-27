@@ -24,10 +24,6 @@ inputs:
     description: "Flutter version"
     required: false
     default: "3.24.1"
-  flutter_web_renderer:
-    description: "Flutter web renderer"
-    required: false
-    default: "html"
   environment:
     description: "Deployment environment (production/preview)"
     required: false
@@ -58,12 +54,10 @@ runs:
 
     - name: Build Flutter chart component
       shell: bash
-      env:
-        FLUTTER_WEB_RENDERER: ${{ inputs.flutter_web_renderer }}
       run: |
         cd chart_app
         flutter pub get
-        flutter build web --web-renderer "$FLUTTER_WEB_RENDERER" --release
+        flutter build web --wasm --release
         cd ..
 
     - name: Build application

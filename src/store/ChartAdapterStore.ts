@@ -157,7 +157,7 @@ export default class ChartAdapterStore {
         const initState = window._flutter.initState;
         initState.isMounted = true;
 
-        if (initState.isEngineIntialized && !initState.isInitialRunCompleted) {
+        if (initState.isEngineInitialized && !initState.isInitialRunCompleted) {
             runChartApp();
         }
 

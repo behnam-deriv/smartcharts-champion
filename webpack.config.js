@@ -50,9 +50,15 @@ const config = {
         devMiddleware: {
             writeToDisk: true,
         },
+        // Cross-Origin Isolation headers enable the skwasm WASM renderer in supported browsers,
+        // Without them, window.crossOriginIsolated is false and Flutter falls back to canvaskit.
+        headers: {
+            'Cross-Origin-Opener-Policy': 'same-origin',
+            'Cross-Origin-Embedder-Policy': 'credentialless',
+        },
     },
     module: {
-        noParse: [/main\.dart\.js$/, /canvaskit\/.*\.js$/],
+        noParse: [/main\.dart\.js$/, /flutter\.js$/, /main\.dart\.mjs$/, /canvaskit\/.*\.js$/],
         rules: [
             {
                 test: /\.svg$/,
@@ -136,7 +142,7 @@ const config = {
             // { parser: {  amd: false  } },
             {
                 test: /\.(js|jsx)$/,
-                exclude: [/node_modules/, /\\scripts/, /main\.dart\.js$/, /.*\.smartcharts\.js$/],
+                exclude: [/node_modules/, /\\scripts/, /main\.dart\.js$/, /flutter\.js$/, /main\.dart\.mjs$/, /.*\.smartcharts\.js$/],
                 loader: 'eslint-loader',
                 enforce: 'pre',
                 options: { fix: true },
