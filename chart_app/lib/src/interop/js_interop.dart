@@ -135,7 +135,11 @@ extension JSContractsUpdateExtension on JSContractsUpdate {
   external int? get currentEpoch;
 
   /// Direction of the markers
-  external String get direction;
+  /// 
+  /// Nullable because in dart2js the undefined→null coercion is silent,
+  /// but dart2wasm (skwasm) throws a TypeError when converting undefined to the
+  /// non-nullable String type.
+  external String? get direction;
 
   /// Profit/Loss text to be shown in marker group
   external String? get profitAndLossText;

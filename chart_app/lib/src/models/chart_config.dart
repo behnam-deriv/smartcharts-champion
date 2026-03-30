@@ -139,7 +139,7 @@ class ChartConfigModel extends ChangeNotifier {
             markerLabel: _getProperty(_markerGroup.props, 'markerLabel'),
             contractMarkerLeftPadding:
                 _getProperty(_markerGroup.props, 'contractMarkerLeftPadding') ??
-                    8,
+                    8.0,
           ),
           currentEpoch: _markerGroup.currentEpoch,
           profitAndLossText: _markerGroup.profitAndLossText,
@@ -246,6 +246,13 @@ class ChartConfigModel extends ChangeNotifier {
       return null;
     }
 
-    return props.getProperty(targetPropName.toJS);
+    // .dartify() converts JS primitives to their Dart equivalents
+    // (JSBoolean→bool, JSNumber→num, JSString→String, undefined→null).
+    // Without this, dart2wasm (skwasm) throws a TypeError when the caller
+    // assigns the returned JSAny to a typed Dart field such as `bool` or
+    // `double`, because dart2wasm enforces strict type safety between JS
+    // interop types and Dart primitives — unlike dart2js where they share
+    // the same JavaScript runtime representation.
+    return props.getProperty(targetPropName.toJS)?.dartify();
   }
 }

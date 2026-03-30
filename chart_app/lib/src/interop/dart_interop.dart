@@ -103,8 +103,12 @@ class ChartConfigWrapper {
   void updateLiveStatus(bool isLive) => _model.updateLiveStatus(isLive);
   void updateCrosshairVisibility(bool visible) =>
       _model.updateCrosshairVisibility(visible);
-  void updateLeftMargin(double margin) => _model.updateLeftMargin(margin);
-  void updateRightPadding(int padding) => _model.updateRightPadding(padding);
+  void updateLeftMargin(double? margin) {
+    if (margin != null) _model.updateLeftMargin(margin);
+  }
+  void updateRightPadding(int? padding) {
+    if (padding != null) _model.updateRightPadding(padding);
+  }
   void toggleTimeIntervalVisibility(bool visible) =>
       _model.toggleTimeIntervalVisibility(visible);
   void setSymbolClosed(bool closed) => _model.setSymbolClosed(closed);
